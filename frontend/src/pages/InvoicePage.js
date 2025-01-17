@@ -6,7 +6,6 @@ const InvoicePage = ({ currentUser }) => {
   const [invoices, setInvoices] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
-  // Create Invoice form fields
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [amount, setAmount] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -14,7 +13,7 @@ const InvoicePage = ({ currentUser }) => {
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
-  const [status, setStatus] = useState("Due"); // Default value aligned with model
+  const [status, setStatus] = useState("Due"); 
 
   // Filters
   const [statusFilter, setStatusFilter] = useState("");
@@ -93,14 +92,19 @@ const InvoicePage = ({ currentUser }) => {
 
   const handleTriggerZap = async (invoiceId) => {
     try {
-      await axios.post(
+      const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/invoices/trigger-zap`,
         { invoiceId },
         { withCredentials: true }
       );
-      alert("Zap Triggered!");
+      alert(response.data.message || "Zap Triggered!");
     } catch (error) {
       console.error("Error triggering Zap:", error);
+      if (error.response && error.response.data && error.response.data.message) {
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        alert("Failed to trigger Zap. Please try again.");
+      }
     }
   };
 

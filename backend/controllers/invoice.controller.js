@@ -1,6 +1,6 @@
 const Invoice = require('../models/invoice.model');
 const User = require('../models/user.model');
-const transporter = require('../config/nodemailer');
+const axios = require('axios');
 
 exports.getInvoices = async (req, res) => {
   try {
@@ -172,6 +172,7 @@ exports.markInvoicePaid = async (req, res) => {
   }
 };
 
+const ZAPIER_WEBHOOK_URL = process.env.ZAPIER_WEBHOOK_URL;
 exports.triggerZapier = async (req, res) => {
   try {
     if (!req.user) {
@@ -179,6 +180,10 @@ exports.triggerZapier = async (req, res) => {
     }
 
     const { invoiceId } = req.body;
+    if (!invoiceId) {
+      return res.status(400).send({ message: 'Invoice ID is required.' });
+    }
+
     const invoice = await Invoice.findById(invoiceId);
     if (!invoice) {
       return res.status(404).send({ message: 'Invoice not found' });
@@ -188,9 +193,40 @@ exports.triggerZapier = async (req, res) => {
       return res.status(403).send({ message: 'Forbidden' });
     }
 
-    return res.send({ message: 'Zap triggered (placeholder logic here).' });
+    // Payload for Zapier
+    const zapPayload = {
+      invoiceNumber: invoice.invoiceNumber,
+      recipientName: invoice.recipient.name,
+      recipientEmail: invoice.recipient.email,
+      amount: invoice.amount,
+      dueDate: invoice.dueDate,
+      status: invoice.status,
+      createdAt: invoice.createdAt,
+    };
+
+    console.log(zapPayload);
+    
+    if (!ZAPIER_WEBHOOK_URL) {
+      console.error('Zapier webhook URL is not configured.');
+      return res.status(500).send({ message: 'Zapier webhook URL not configured.' });
+    }
+
+    const zapResponse = await axios.post(ZAPIER_WEBHOOK_URL, zapPayload);
+
+    if (zapResponse.status === 200 || zapResponse.status === 201) {
+      return res.send({ message: 'Zap successfully triggered.' });
+    } else {
+      console.error('Unexpected response from Zapier:', zapResponse.status, zapResponse.data);
+      return res.status(500).send({ message: 'Failed to trigger Zap.' });
+    }
   } catch (error) {
     console.error('Error in triggerZapier:', error);
-    return res.status(500).send({ message: 'Internal Server Error' });
+    if (error.response) {
+      return res.status(500).send({ message: 'Zapier responded with an error.', details: error.response.data });
+    } else if (error.request) {
+      return res.status(500).send({ message: 'No response from Zapier.' });
+    } else {
+      return res.status(500).send({ message: 'Failed to trigger Zap.' });
+    }
   }
 };

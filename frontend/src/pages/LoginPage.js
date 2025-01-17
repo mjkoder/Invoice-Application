@@ -2,6 +2,7 @@ import React from "react";
 import loginImage from "../assets/login-image.jpg"; 
 
 const LoginPage = () => {
+  
   const handleGoogleLogin = () => {
     window.location.href = `${process.env.REACT_APP_BACKEND_URL}/auth/google`;
   };
