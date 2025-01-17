@@ -2,7 +2,6 @@ const Invoice = require('../models/invoice.model');
 const User = require('../models/user.model');
 const transporter = require('../config/nodemailer');
 
-// GET /invoices?status=&sort=
 exports.getInvoices = async (req, res) => {
   try {
     if (!req.user) {

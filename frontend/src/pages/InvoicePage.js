@@ -20,7 +20,6 @@ const InvoicePage = ({ currentUser }) => {
   const [statusFilter, setStatusFilter] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  // Fetch invoices
   const fetchInvoices = useCallback(async () => {
     try {
       let url = `${process.env.REACT_APP_BACKEND_URL}/invoices?`;

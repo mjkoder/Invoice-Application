@@ -21,7 +21,7 @@ function App() {
     axios
       .get(`${process.env.REACT_APP_BACKEND_URL}/auth/current`, { withCredentials: true })
       .then((res) => {
-        setCurrentUser(res.data); // user object or empty object
+        setCurrentUser(res.data);
         console.log('User data:', res.data);  
       })
       .catch(() => {
@@ -34,13 +34,10 @@ function App() {
     setIsLoggingOut(true);
     try {
       console.log('Logout button clicked');
-      // Make a POST request to '/auth/logout'
       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/logout`, {}, { withCredentials: true });
       console.log('Logout response:', response.data);
-      // Clear the local user state
-      setCurrentUser(null);
+      setCurrentUser(null); // Clear the local user state
       console.log('Logout successful.');
-      // Redirect to "/"
       window.location.href = '/';
     } catch (error) {
       console.error('Logout error:', error);
@@ -84,11 +81,8 @@ function App() {
         )}
       </nav>
 
-      <Routes>
-        {/* Login page at "/" */}
+      <Routes> {/* Protect Routes*/}
         <Route path="/" element={<LoginPage />} />
-
-        {/* Protect /invoices */}
         <Route
           path="/invoices"
           element={
@@ -99,8 +93,6 @@ function App() {
             )
           }
         />
-
-        {/* Protect /dashboard */}
         <Route
           path="/dashboard"
           element={
