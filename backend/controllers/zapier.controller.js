@@ -172,7 +172,7 @@ exports.scheduleAutomate = async () => {
         };
   
         try {
-          const response = await axios.post(ZAPIER_WORKING_ZAP_URL, zapPayload);
+          const response = await axios.post(ZAPIER_WEBHOOK_URL, zapPayload);
           if (response.status === 200 || response.status === 201) {
             console.log(`Email reminder sent to ${recipient.recipientEmail}`);
           } else {
