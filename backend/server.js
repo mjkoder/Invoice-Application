@@ -5,7 +5,10 @@ const session = require("express-session");
 const passport = require("./config/passport");
 const authRoutes = require("./routes/auth.routes");
 const invoiceRoutes = require("./routes/invoice.routes");
+const zapierRoutes = require("./routes/zapier.routes");
+const { scheduleAutomate } = require('./controllers/zapier.controller');
 require("./config/database");
+const cron = require('node-cron');
 
 const app = express();
 app.use(
@@ -34,6 +37,12 @@ app.use(passport.session());
 
 app.use("/auth", authRoutes);
 app.use("/invoices", invoiceRoutes);
+app.use("/automate", zapierRoutes);
+
+cron.schedule('0 * * * *', () => {
+  console.log('Running scheduled automation...');
+  scheduleAutomate();
+});
 
 // Centralized Error Handling Middleware
 app.use((err, req, res, next) => {

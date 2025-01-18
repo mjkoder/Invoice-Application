@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { PlusCircle, Filter, Zap } from "lucide-react";
+import { PlusCircle, Filter, Zap, Play, StopCircle } from "lucide-react";
 
 const InvoicePage = ({ currentUser }) => {
   const [invoices, setInvoices] = useState([]);
   const [showForm, setShowForm] = useState(false);
-
+  const [automatedInvoices, setAutomatedInvoices] = useState([]);
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [amount, setAmount] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -13,7 +13,7 @@ const InvoicePage = ({ currentUser }) => {
   const [recipientPhone, setRecipientPhone] = useState("");
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
-  const [status, setStatus] = useState("Due"); 
+  const [status, setStatus] = useState("Due");
 
   // Filters
   const [statusFilter, setStatusFilter] = useState("");
@@ -34,6 +34,18 @@ const InvoicePage = ({ currentUser }) => {
       console.error("Error fetching invoices:", error);
     }
   }, [statusFilter, sortOrder]);
+
+  const fetchAutomatedInvoices = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/automate`,
+        { withCredentials: true }
+      );
+      setAutomatedInvoices(response.data.map((invoice) => invoice.invoiceId));
+    } catch (error) {
+      console.error("Error fetching automated invoices:", error);
+    }
+  }, []);
 
   useEffect(() => {
     if (currentUser && currentUser._id) {
@@ -100,7 +112,11 @@ const InvoicePage = ({ currentUser }) => {
       alert(response.data.message || "Zap Triggered!");
     } catch (error) {
       console.error("Error triggering Zap:", error);
-      if (error.response && error.response.data && error.response.data.message) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         alert(`Error: ${error.response.data.message}`);
       } else {
         alert("Failed to trigger Zap. Please try again.");
@@ -108,21 +124,41 @@ const InvoicePage = ({ currentUser }) => {
     }
   };
 
-  const handleAutomateReminder = async (invoiceId) => {
+  const automateReminder = async (invoiceId) => {
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/invoices/automate-reminder`,
+        `${process.env.REACT_APP_BACKEND_URL}/automate/add`,
         { invoiceId },
         { withCredentials: true }
       );
-      alert(response.data.message || 'Automation enabled successfully!');
+      alert(response.data.message || "Automation enabled successfully!");
+      fetchAutomatedInvoices();
     } catch (error) {
-      console.error('Error enabling automation:', error);
-      alert(
-        error.response?.data?.message || 'Failed to enable automation. Please try again.'
+      console.error(
+        "Error automating reminder:",
+        error.response?.data || error.message
       );
+      alert(error.response?.data?.message || "Failed to automate reminder.");
     }
-  };  
+  };
+
+  const deactivateReminder = async (invoiceId) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/automate/remove`,
+        { invoiceId },
+        { withCredentials: true }
+      );
+      alert(response.data.message || "Automation disabled successfully!");
+      fetchAutomatedInvoices();
+    } catch (error) {
+      console.error(
+        "Error deactivating reminder:",
+        error.response?.data || error.message
+      );
+      alert(error.response?.data?.message || "Failed to deactivate reminder.");
+    }
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -312,13 +348,23 @@ const InvoicePage = ({ currentUser }) => {
                             <Zap size={14} className="mr-1" />
                             Trigger
                           </button>
-                          <button
-                            onClick={() => handleAutomateReminder(inv._id)}
-                            className="flex items-center justify-center bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700"
-                          >
-                            <Zap size={14} className="mr-1" />
-                            Automate
-                          </button>
+                          {automatedInvoices.includes(inv._id) ? (
+                            <button
+                              onClick={() => deactivateReminder(inv._id)}
+                              className="flex items-center justify-center bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                            >
+                              <StopCircle size={14} />
+                              <span className="mr-1">Deactivate</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => automateReminder(inv._id)}
+                              className="flex items-center justify-center bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                            >
+                              <Play size={14} />
+                              <span className="mr-1">Automate</span>
+                            </button>
+                          )}
                         </div>
                       )}
                     </td>
