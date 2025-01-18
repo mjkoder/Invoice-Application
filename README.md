@@ -76,6 +76,7 @@ A web application for managing and tracking invoices with user authentication, f
     GOOGLE_CLIENT_ID=your_google_client_id
     GOOGLE_CLIENT_SECRET=your_google_client_secret
     FRONTEND_URL=http://localhost:3000
+    ZAPIER_WEBHOOK_URL=your_zapier_webhook_url
 
     # For sending emails
     EMAIL_SERVICE=gmail
@@ -141,6 +142,7 @@ A web application for managing and tracking invoices with user authentication, f
 - `GOOGLE_CLIENT_ID`: Google OAuth Client ID.
 - `GOOGLE_CLIENT_SECRET`: Google OAuth Client Secret.
 - `FRONTEND_URL`: Frontend application URL (e.g., `http://localhost:3000`).
+- `ZAPIER_WEBHOOK_URL`: Zapier Webhook URL
 - `# For sending emails`
 - `EMAIL_SERVICE`:gmail
 - `EMAIL_USER`: Your Gmail Address from where email will be sent.

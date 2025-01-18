@@ -9,11 +9,16 @@ const DashboardPage = ({ currentUser }) => {
 
   const fetchInvoices = useCallback(async () => {
     try {
-      const res1 = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/invoices?sort=desc`, {
-        withCredentials: true,
-      });
+      const res1 = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/invoices?sort=desc`,
+        {
+          withCredentials: true,
+        }
+      );
       const all = res1.data;
-      const unPaid = all.filter((inv) => inv.status === "Due" || inv.status === "Overdue");
+      const unPaid = all.filter(
+        (inv) => inv.status === "Due" || inv.status === "Overdue"
+      );
       const paid = all.filter((inv) => inv.status === "Paid");
       setDueInvoices(unPaid);
       setPaidInvoices(paid);
@@ -83,6 +88,14 @@ const DashboardPage = ({ currentUser }) => {
       <html>
       <head>
         <style>
+          @page {
+            margin: 0;
+          }
+          body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+          }
           table {
             width: 100%;
             border-collapse: collapse;
@@ -135,8 +148,12 @@ const DashboardPage = ({ currentUser }) => {
     `;
     const newWindow = window.open("", "_blank");
     newWindow.document.write(printContent);
-    newWindow.print();
-    newWindow.close();
+
+    // pdf content loads before printing
+    setTimeout(() => {
+      newWindow.print();
+      newWindow.close();
+    }, 100);
   };
 
   return (
@@ -179,16 +196,18 @@ const DashboardPage = ({ currentUser }) => {
               >
                 <td className="p-4 border-b">#{inv.invoiceNumber}</td>
                 <td className="p-4 border-b">${inv.amount}</td>
-                <td className="p-4 border-b">{new Date(inv.dueDate).toLocaleDateString()}</td>
+                <td className="p-4 border-b">
+                  {new Date(inv.dueDate).toLocaleDateString()}
+                </td>
                 <td className="p-4 border-b align-middle">
-                      <span
-                        className={`inline-flex items-center justify-center w-24 h-8 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                          inv.status
-                        )}`}
-                      >
-                        {inv.status}
-                      </span>
-                    </td>
+                  <span
+                    className={`inline-flex items-center justify-center w-24 h-8 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                      inv.status
+                    )}`}
+                  >
+                    {inv.status}
+                  </span>
+                </td>
                 <td className="p-4 border-b space-x-2">
                   <button
                     onClick={() => updateDueDate(inv._id)}
@@ -208,7 +227,8 @@ const DashboardPage = ({ currentUser }) => {
                 {selectedInvoice && selectedInvoice._id === inv._id && (
                   <div className="absolute top-full left-0 bg-gray-50 border rounded shadow-lg w-full z-10 p-4">
                     <p>
-                      <strong>Recipient Name:</strong> {selectedInvoice.recipient.name}
+                      <strong>Recipient Name:</strong>{" "}
+                      {selectedInvoice.recipient.name}
                     </p>
                     <p>
                       <strong>Email:</strong> {selectedInvoice.recipient.email}
@@ -217,7 +237,8 @@ const DashboardPage = ({ currentUser }) => {
                       <strong>Phone:</strong> {selectedInvoice.recipient.phone}
                     </p>
                     <p>
-                      <strong>Address:</strong> {selectedInvoice.recipient.address}
+                      <strong>Address:</strong>{" "}
+                      {selectedInvoice.recipient.address}
                     </p>
                   </div>
                 )}
@@ -258,20 +279,23 @@ const DashboardPage = ({ currentUser }) => {
               >
                 <td className="p-4 border-b">#{inv.invoiceNumber}</td>
                 <td className="p-4 border-b">${inv.amount}</td>
-                <td className="p-4 border-b">{new Date(inv.dueDate).toLocaleDateString()}</td>
+                <td className="p-4 border-b">
+                  {new Date(inv.dueDate).toLocaleDateString()}
+                </td>
                 <td className="p-4 border-b align-middle">
-                      <span
-                        className={`inline-flex items-center justify-center w-24 h-8 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                          inv.status
-                        )}`}
-                      >
-                        {inv.status}
-                      </span>
-                    </td>
+                  <span
+                    className={`inline-flex items-center justify-center w-24 h-8 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                      inv.status
+                    )}`}
+                  >
+                    {inv.status}
+                  </span>
+                </td>
                 {selectedInvoice && selectedInvoice._id === inv._id && (
                   <div className="absolute top-full left-0 bg-gray-50 border rounded shadow-lg w-full z-10 p-4">
                     <p>
-                      <strong>Recipient Name:</strong> {selectedInvoice.recipient.name}
+                      <strong>Recipient Name:</strong>{" "}
+                      {selectedInvoice.recipient.name}
                     </p>
                     <p>
                       <strong>Email:</strong> {selectedInvoice.recipient.email}
@@ -280,7 +304,8 @@ const DashboardPage = ({ currentUser }) => {
                       <strong>Phone:</strong> {selectedInvoice.recipient.phone}
                     </p>
                     <p>
-                      <strong>Address:</strong> {selectedInvoice.recipient.address}
+                      <strong>Address:</strong>{" "}
+                      {selectedInvoice.recipient.address}
                     </p>
                   </div>
                 )}

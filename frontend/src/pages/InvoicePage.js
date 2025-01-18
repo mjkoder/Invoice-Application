@@ -108,6 +108,22 @@ const InvoicePage = ({ currentUser }) => {
     }
   };
 
+  const handleAutomateReminder = async (invoiceId) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/invoices/automate-reminder`,
+        { invoiceId },
+        { withCredentials: true }
+      );
+      alert(response.data.message || 'Automation enabled successfully!');
+    } catch (error) {
+      console.error('Error enabling automation:', error);
+      alert(
+        error.response?.data?.message || 'Failed to enable automation. Please try again.'
+      );
+    }
+  };  
+
   const getStatusColor = (status) => {
     switch (status) {
       case "Paid":
@@ -288,13 +304,22 @@ const InvoicePage = ({ currentUser }) => {
 
                     <td className="p-4 border-b align-middle">
                       {inv.status !== "Paid" && (
-                        <button
-                          onClick={() => handleTriggerZap(inv._id)}
-                          className="flex items-center justify-center bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700"
-                        >
-                          <Zap size={14} className="mr-1" />
-                          Trigger Zap
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleTriggerZap(inv._id)}
+                            className="flex items-center justify-center bg-pink-600 text-white px-3 py-1 rounded hover:bg-pink-700"
+                          >
+                            <Zap size={14} className="mr-1" />
+                            Trigger
+                          </button>
+                          <button
+                            onClick={() => handleAutomateReminder(inv._id)}
+                            className="flex items-center justify-center bg-orange-600 text-white px-3 py-1 rounded hover:bg-orange-700"
+                          >
+                            <Zap size={14} className="mr-1" />
+                            Automate
+                          </button>
+                        </div>
                       )}
                     </td>
                   </tr>
