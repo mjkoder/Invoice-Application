@@ -105,7 +105,7 @@ const InvoicePage = ({ currentUser }) => {
   const handleTriggerZap = async (invoiceId) => {
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/invoices/trigger-zap`,
+        `${process.env.REACT_APP_BACKEND_URL}/automate/trigger-zap`,
         { invoiceId },
         { withCredentials: true }
       );
